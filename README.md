@@ -30,5 +30,6 @@ This repository contains files for the air temperature and soil nitrogen supply 
 
 - Nfert: soil nitrogen supply treatment (ppm).
 
-- 
+
+_ for inquiries contact me on (dowusukw@ttu.edu).
 
