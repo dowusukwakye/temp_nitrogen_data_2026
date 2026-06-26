@@ -1,3 +1,7 @@
+#The following are the codes for the analysis and data visualization of the 
+#Air temperature and soil nitrogen supply experiment.
+
+#load the important libraries
 library(readxl)
 library(dplyr)
 library(readr)
@@ -12,16 +16,21 @@ library(broom)
 library(stringr)
 library(cowplot)
 
+#custom theme for data visualization
 theme.custom<- theme_bw()+
   theme(panel.grid = element_blank(),
         axis.title = element_text(size=15),
         panel.border = element_rect(linewidth=2))
 
+#upload the curve level data
 tresp_data <- read_csv("curve_level_data.csv")
 head(tresp_data)
 view(tresp_data)
 
-#the quadratic term to estimate parameter values a, b, c for Vcmax and Jmax
+#tempereature response curve is generated using the third order polynomial used 
+#by (smith and Dukes 2017).
+
+#describe the quadratic term to estimate parameter values a, b, c for Vcmax and Jmax
 tresp_data <- tresp_data%>% mutate(Tleaf_mean2 = Tleaf_mean^2) 
 head(tresp_data) 
 #create new plant ids 
@@ -29,7 +38,7 @@ tresp_data <- tresp_data %>% mutate(plant_id_new = str_extract(id, "^[^_]+"))
 head(tresp_data)
 
 
-#fitting model per plant id for vcmax-------------------------------
+#fitting model per plant id for Vcmax-------------------------------
 quad_exp_fit_lm <- tresp_data %>%
   group_by(plant_id_new) %>% #group by plant id
   filter(!is.na(obs_vcmax)) %>%  # remove NA rows
@@ -48,12 +57,10 @@ quad_exp_fit_lm <- tresp_data %>%
 head(quad_exp_fit_lm)
 summary(quad_exp_fit_lm)
 
-
 #writing the model fit as excel sheet
-
 write_xlsx(quad_exp_fit_lm, "vcmax_tempresp_fits.xlsx")
 
-#upload extracted a, b, and c values with treatment information for vcmax 
+#upload extracted a, b, and c values with treatment information for Vcmax 
 vcmax_tempresp_fits <- read_csv("vcmax_tempresp_fits.csv")
 vcmax_tempresp_fits <- vcmax_tempresp_fits %>%
   mutate(airtemp_factor = factor(airtemp_factor,
@@ -71,13 +78,13 @@ nvcmax_tempresp_fits <- vcmax_tempresp_fits %>%
   filter(c < 0,b <= 10, a <=10)
 head(nvcmax_tempresp_fits)
 view(nvcmax_tempresp_fits)
+
 #check distribution for good fits
 hist(nvcmax_tempresp_fits$ a, main = "Distribution of a")
 hist(nvcmax_tempresp_fits$ b, main = "Distribution of b")
 hist(nvcmax_tempresp_fits$ c, main = "Distribution of c")
 
-
-##fit lme model for parameter a
+##fit lmer model for parameter a
 a_lmer <- lmer(a ~ Nfert * airtemp_factor + 
                  (1|Rack:airtemp_factor), data = nvcmax_tempresp_fits)
 plot(residuals(a_lmer)~fitted(a_lmer))
@@ -85,7 +92,8 @@ summary(a_lmer)
 Anova(a_lmer)
 emmeans(a_lmer, ~ Nfert * airtemp_factor)
 a_emm <- emmeans(a_lmer, ~ airtemp_factor)
-##fit lme model for parameter b
+
+##fit lmer model for parameter b
 b_lmer <- lmer(b ~ Nfert * airtemp_factor + 
                  (1|Rack:airtemp_factor), data = nvcmax_tempresp_fits)
 plot(residuals(b_lmer)~fitted(b_lmer))
@@ -93,7 +101,8 @@ summary(b_lmer)
 Anova(b_lmer)
 emmeans(b_lmer, ~ Nfert * airtemp_factor)
 b_emm <- emmeans(b_lmer, ~ airtemp_factor)
-##fit lme model for parameter c
+
+##fit lmer model for parameter c
 c_lmer <- lmer(c ~ Nfert * airtemp_factor + 
                  (1|Rack:airtemp_factor), data = nvcmax_tempresp_fits)
 plot(residuals(c_lmer)~fitted(c_lmer))
@@ -102,8 +111,7 @@ Anova(c_lmer)
 emmeans(c_lmer, ~ Nfert * airtemp_factor)
 c_emm <- emmeans(c_lmer, ~ airtemp_factor)
 
-
-#convert emeans to dataframe
+#convert em means to data frame
 a_emm_df <- as.data.frame(a_emm)
 b_emm_df <- as.data.frame(b_emm)
 c_emm_df <- as.data.frame(c_emm)
@@ -116,8 +124,10 @@ mean_params <- data.frame(
   b = b_emm_df$emmean, 
   c = c_emm_df$emmean )
 mean_params
+
 #creating temperature sequence
 temp_seq <- seq(15, 50, by = 0.5)
+
 #generaating smooth curves
 curve_data <- mean_params %>%
   rowwise() %>% mutate(
@@ -184,7 +194,6 @@ view(vcmax_25_tempresp_fits)
 #write vcmax25
 write_xlsx(vcmax25_tempresp_fits, "vcmax25_tempresp_fits.xlsx")
 
-
 #jmax-------------------------------
 ##fiting model for jmax
 quad_exp_jfit_lm <- tresp_data %>%
@@ -206,7 +215,6 @@ quad_exp_jfit_lm <- tresp_data %>%
 head(quad_exp_jfit_lm)
 summary(quad_exp_jfit_lm)
 
-
 #writing the model fit as excel sheet
 
 write_xlsx(quad_exp_jfit_lm, "jmax_tempresp_fits1.csv")
@@ -219,7 +227,6 @@ jmax_tempresp_fits1 <- jmax_tempresp_fits1 %>%
                                  levels = c("High", "Medium", "Low")))
 head(jmax_tempresp_fits1)
 view(jmax_tempresp_fits1)
-
 
 #check distributions for a, b, and c
 hist(jmax_tempresp_fits1$ a, main = "Distribution of a")
@@ -242,8 +249,7 @@ hist(jmax_tempresp_filter$ a, main = "Distribution of a")
 hist(jmax_tempresp_filter$ b, main = "Distribution of b")
 hist(jmax_tempresp_filter$ c, main = "Distribution of c")
 
-#fit lme for parameter a
-
+#fit lmer for parameter a
 aj_lmer <- lmer(a ~ Nfert * airtemp_factor + 
                   (1|Rack:airtemp_factor), data = jmax_tempresp_filter)
 plot(residuals(aj_lmer)~fitted(aj_lmer))
@@ -252,7 +258,7 @@ Anova(aj_lmer)
 emmeans(aj_lmer, ~ Nfert * airtemp_factor)
 a_emm <- emmeans(aj_lmer, ~ airtemp_factor)
 
-#fit lme for parameter b
+#fit lmer for parameter b
 bj_lmer <- lmer(b ~ Nfert * airtemp_factor + 
                   (1|Rack:airtemp_factor), data = jmax_tempresp_filter)
 plot(residuals(bj_lmer)~fitted(bj_lmer))
@@ -261,7 +267,7 @@ Anova(bj_lmer)
 emmeans(bj_lmer, ~ Nfert * airtemp_factor)
 b_emm <- emmeans(bj_lmer, ~ airtemp_factor)
 
-#fit lme for parameter b
+#fit lmer for parameter b
 cj_lmer <- lmer(c ~ Nfert * airtemp_factor + 
                   (1|Rack:airtemp_factor), data = jmax_tempresp_filter)
 plot(residuals(cj_lmer)~fitted(cj_lmer))
@@ -287,7 +293,7 @@ mean_params
 #creating temperature sequence
 temp_seq <- seq(15, 50, by = 0.5)
 
-#generaating smooth curves
+#generating smooth curves
 curve_data <- mean_params %>%
   rowwise() %>% mutate(
     temp = list(temp_seq), Jmax = list(exp(a + b * temp_seq + c * temp_seq^2)) ) %>%
@@ -376,8 +382,6 @@ view(merged25_data)
 #write merged vcmax25 and jmax25 and use later
 write_xlsx(merged25_data, "vcmax25_jmax25.xlsx")
 
-
-
 #jv data
 #jv_data was extracted by using
 #J:V=Vcmax(Ta)/Jmax(Ta) 
@@ -418,7 +422,7 @@ jv_data <- jv_data %>%
 head(jv_data)
 view(jv_data)
 
-##fit lme model for Jmax/Vcmax
+##fit lmer model for Jmax/Vcmax
 jv_lmer <- lmer(JV_ratio ~ Nfert * airtemp_factor + 
                   (1|airtemp_factor), data = jv_data)
 plot(residuals(jv_lmer)~fitted(jv_lmer))
@@ -773,7 +777,6 @@ final_data$Marea <- final_data$`Leaf biomass (g)`/final_data$area_m2
 final_data$N_leaf <- final_data$nmass * final_data$`Leaf biomass (g)` #compute total N per leaf
 final_data$Narea <- final_data$N_leaf / final_data$area_m2 #calculate Narea
 
-
 #drop incomplete/NA rows
 clean_final_data <- final_data%>%
   filter(!is.na(Vcmax25), !is.na(Jmax25))
@@ -853,7 +856,7 @@ view(clean_final_data)
 ##figures for vcmax25, jmax25, Chlarea, Chlmass, Narea, Marea,
  #Nmass, p_rubisco, p_bioenergetics,p_lightharvesting
  
- ###Nmass
+ ###Nmass----------------------------------------------------------
  ##explore data
  hist(clean_final_data$nmass)#pretty ok
  plot(nmass~Nfert, data = clean_final_data) #clear platteau
@@ -1004,7 +1007,7 @@ narea_intercept_all <- summary(
  narea_plot
  
  
- ##Marea
+ ##Marea----------------------------------------------
  ##explore data
  hist(clean_final_data$Marea) #skewed
  hist(log(clean_final_data$Marea))# better
@@ -1081,6 +1084,7 @@ narea_intercept_all <- summary(
  Marea_plot <- Marea_plot + common_theme
  narea_plot <- narea_plot + common_theme
  nmass_plot <- nmass_plot + common_theme
+ 
  #merge plots-------------------------------------
  library(patchwork)
  n_allocation <- 
@@ -1179,7 +1183,7 @@ narea_intercept_all <- summary(
  Vcmax25_plot
  
   
- #jmax25 
+ #jmax25 ----------------------------------------------
  hist(clean_final_data$Jmax25)
  hist(log(clean_final_data$Jmax25))# better
  plot(Jmax25~Nfert, data = clean_final_data) #clear plateau
@@ -1258,7 +1262,7 @@ narea_intercept_all <- summary(
  
  Jmax25_plot
 
- ##chl_area chl_mmol.m2
+ ##chl_area chl_mmol.m2 ------------------------------------------
  hist(clean_final_data$chl_mmol.m2)
  hist(log(clean_final_data$chl_mmol.m2))# better
  plot(chl_mmol.m2~Nfert, data = clean_final_data) #clear plateau
@@ -1347,13 +1351,14 @@ narea_intercept_all <- summary(
  
  photosynthetic_components_figure +
    plot_annotation(tag_levels = "A")
+ 
  ##export 
  ggsave(" photosynthetic_components_figure.tiff",
         width = 6.7,
         height = 5.9,
         dpi = 600, compression = "lzw")
  
- #p_rubisco
+ #p_rubisco -------------------------------------------------------
  hist(clean_final_data$propN_rubisco)
  hist(log(clean_final_data$propN_rubisco))# better
  plot(propN_rubisco~Nfert, data = clean_final_data) #clear plateau
@@ -1434,7 +1439,7 @@ narea_intercept_all <- summary(
  
  rubisco_plot
  
-#pbioenergetics
+#pbioenergetics ------------------------------------------------------
 
  hist(clean_final_data$propN_bioenergetics)
  hist(log(clean_final_data$propN_bioenergetics))# better
@@ -1484,9 +1489,6 @@ narea_intercept_all <- summary(
  bioenergetics_func_all <- function(x)
  {bioenergetics_emtrend_all[1,2] * x + bioenergetics_intercept_all[1,2]}
  
- 
-  
- 
  ##p_bioenergetics plot
  bioenergetics_plot<-ggplot(
    clean_final_data %>% filter(propN_bioenergetics < 0.2),
@@ -1518,8 +1520,7 @@ narea_intercept_all <- summary(
  
  bioenergetics_plot
 
- #propN_lightharvesting
-  
+ #propN_lightharvesting --------------------------------------------------
  hist(clean_final_data$rho_lh)
  hist(log(clean_final_data$rho_lh))# better
  plot(rho_lh~Nfert, data = clean_final_data) #clear plateau 
@@ -1552,9 +1553,6 @@ narea_intercept_all <- summary(
                                                    at = list(Nfert = 0, airtemp_factor = 'Medium')))
  rho_lh_intercept_low <- summary(emmeans(rho_lh_lmer, ~1,
                                                 at = list(Nfert = 0, airtemp_factor = 'Low'))) 
- 
- 
- 
  ##creating functions
  rho_lh_func_high <- function(x){
    (rho_lh_emtrend_high[1,2] * x + rho_lh_intercept_high[1,2])}
@@ -1625,7 +1623,7 @@ ggsave(" proportion_N_components.tiff",
  
 ##Tables
 
- # Run ANOVA for photosynthetic components
+ # Run ANOVA for photosynthetic components -----------------------
  rubisco_anova_table <- Anova(rubisco_lmer)
  bio_anova_table     <- Anova(bioenergetics_lmer)
  lh_anova_table      <- Anova(rho_lh_lmer)
