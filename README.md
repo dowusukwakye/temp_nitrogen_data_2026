@@ -41,6 +41,12 @@ The output data folder contains the following files:
 
 - Nfert: soil nitrogen supply treatment (ppm).
 
+**Current DOI badge
+[![DOI](https://zenodo.org/badge/1280644874.svg)](https://doi.org/10.5281/zenodo.20866655)
 
-- For inquiries, contact me at (dowusukw@ttu.edu).
+**Contact**
+
+- Any questions or issues can be submitted to Daniel Owusu Kwakye at (dowusukw@ttu.edu).
+
+
 
