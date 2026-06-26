@@ -7,7 +7,7 @@ This repository contains files for the air temperature and soil nitrogen supply 
 ## **Summary of files**
 
 ### **scripts**
-- The file [temp_nit_2026.R](scripts/temp_nit_2026.R) contains the code for the data analysis and data visualization. It also contains codes for the exponential quadratic equation used for the temperature response curves. 
+- The file [Analysis_temp_nit_2026.r](scripts/Analysis_temp_nit_2026.r) contains the code for the data analysis and data visualization. It also contains codes for the exponential quadratic equation used for the temperature response curves. 
 
 ### **data**
 The data folder contains the following files:
