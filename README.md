@@ -2,7 +2,7 @@
 
 **Repository Description**
 
-This repository contains files for the air temperature and soil nitrogen supply experiment.
+This repository contains files for the air-temperature and soil-nitrogen supply experiment.
 
 ## **Summary of files**
 
@@ -12,21 +12,21 @@ This repository contains files for the air temperature and soil nitrogen supply 
 ### **output data folder**
 The output data folder contains the following files:
 
-- [temp_nitrogen_2026.csv](output data/temp_nitrogen_2026.csv) contains output of chlorophyll, Vcmax, Jmax, and nitrogen allocation-related files.
+- The [temp_nitrogen_2026.csv](output data/temp_nitrogen_2026.csv) contains output of chlorophyll, Vcmax, Jmax, and nitrogen allocation-related files.
 
-- [vcmax_tempresp_fits.csv](output data/vcmax_tempresp_fits.csv) contains parameter values for vcmax, estimated from the quadratic model (Vcmax = exp(a + b * T + c * T^2)
+- The [vcmax_tempresp_fits.csv](output data/vcmax_tempresp_fits.csv) contains parameter values for vcmax, estimated from the quadratic model (Vcmax = exp(a + b * T + c * T^2)
 
-- [jmax_tempresp_fits1.csv](output data/jmax_tempresp_fits1.csv) contains parameter values for jmax, estimated from the quadratic model (Jmax= exp(a + b * T + c * T^2)
+- The [jmax_tempresp_fits1.csv](output data/jmax_tempresp_fits1.csv) contains parameter values for jmax, estimated from the quadratic model (Jmax= exp(a + b * T + c * T^2)
 
 ### **data folder**
 
-- [biomass_2025_data](data/biomass_data.csv) contains morphology and biomass data
+- Here [biomass_2025_data](data/biomass_data.csv) contains morphology and biomass data
 
-- [curve_level data.csv](data/curve_level data.csv) contains the curve level data
+- Here [curve_level data.csv](data/curve_level data.csv) contains the curve level data
 
-- [chlorophyll extraction.csv](data/chlorophyll extraction.csv) contains chrlorophyll extraction raw data
+- Here [chlorophyll extraction.csv](data/chlorophyll extraction.csv) contains chrlorophyll extraction raw data
 
-- [vcmax25_jmax25_only.xlsx](data/vcmax25_jmax25_only.xlsx) contains related files of vcmax25 and jmax25 extracted, but file was merged with the leaf n content file manually.
+- Here [vcmax25_jmax25_only.xlsx](data/vcmax25_jmax25_only.xlsx) contains related files of vcmax25 and jmax25 extracted, but the file was merged with the leaf n content file manually.
 
 
 ## **important names to take note:**
