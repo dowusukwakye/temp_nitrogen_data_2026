@@ -22,9 +22,9 @@ The output data folder contains the following files:
 
 - Here [biomass_2025_data](data/biomass_data.csv) contains morphology and biomass data.
 
-- Here [curve_level data.csv](data/curve_level data.csv) contains the curve level data.
+- Here [curve_level_data.csv](data/curve_level_data.csv) contains the curve level data.
 
-- Here [chlorophyll extraction.numbers](data/chlorophyll extraction.numbers) contains chrlorophyll extraction data
+- Here [chlorophyll_extraction.numbers](data/chlorophyll_extraction.numbers) contains chrlorophyll extraction data
 
 - Here [vcmax25_jmax25_only.xlsx](data/vcmax25_jmax25_only.xlsx) contains related files of vcmax25 and jmax25 extracted, but the file was merged with the leaf n content file manually.
 
