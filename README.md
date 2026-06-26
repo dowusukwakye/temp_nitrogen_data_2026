@@ -4,12 +4,12 @@
 
 This repository contains files for the air temperature and soil nitrogen supply experiment.
 
-#Summary of files
-- The script Rscript temp_nitrogen_2025.R contains the code for the data analysis and data visualization. It also contains codes for the exponential quadratic equation used for the temperature response curves. 
+## **Summary of files**
+- The file [temp_nit_2026.R] contains the code for the data analysis and data visualization. It also contains codes for the exponential quadratic equation used for the temperature response curves. 
 
 - temp_nitrogen_2025 contains chlorophyll and nitrogen allocation-related files.
 
-- curve_leveldata contains ACi curve level data.
+- scripts folder contains [curve_leveldata] file, which contains ACi curve level data.
 
 - vcmax_tempresp_fits contains parameter values for vcmax, estimated from the quadratic model
 
@@ -18,7 +18,7 @@ This repository contains files for the air temperature and soil nitrogen supply 
 - biomass_data contains morphology and biomass data
 
 
-##important names to take note:
+## **important names to take note:**
 
 - plant_id: the individual pot ID.
 
