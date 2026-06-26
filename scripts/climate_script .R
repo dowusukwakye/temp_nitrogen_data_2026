@@ -10,13 +10,13 @@ library(readr)
   
 library(readxl)
 library(dplyr)
-  High_air_temp <- read_excel("High air temp.xlsx")
+  High_air_temp <- read_excel("High_air_temp.xlsx")
 View(High_air_temp)
 
-Medium_air_temp <- read_excel("Medium temp.xlsx")
+Medium_air_temp <- read_excel("Medium_temp.xlsx")
 View(Medium_air_temp)
 
-low_air_temp <- read_excel("low temp.xlsx")
+low_air_temp <- read_excel("low_temp.xlsx")
 View(low_air_temp)
 
 #check column names
