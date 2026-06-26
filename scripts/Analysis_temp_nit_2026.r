@@ -21,7 +21,7 @@ tresp_data <- read_csv("curve_level_data.csv")
 head(tresp_data)
 view(tresp_data)
 
-#the quadratic term 
+#the quadratic term to estimate parameter values a, b, c for Vcmax and Jmax
 tresp_data <- tresp_data%>% mutate(Tleaf_mean2 = Tleaf_mean^2) 
 head(tresp_data) 
 #create new plant ids 
@@ -137,7 +137,7 @@ vcmax_emmeans <- mean_params %>%
     Vcmax_lower = exp((a - a_emm_df$SE) + b * Ta + c * Ta^2)
   )
 
-#figure 
+#figure --------------------------
 library(ggplot2) 
 Ta_colors <- c("Low" = "blue","Medium" = "orange", "High" = "red") 
 Ta_linetypes <- c("Low" = "solid", "Medium" = "solid", "High" = "solid")
@@ -173,6 +173,7 @@ ggsave("vcmax_plot.tiff",
        width = 8,
        height = 6,
        dpi = 600)
+
 #estimate vcmax25
 vcmax_25_tempresp_fits <- vcmax_tempresp_fits%>%
   mutate(
@@ -180,17 +181,38 @@ vcmax_25_tempresp_fits <- vcmax_tempresp_fits%>%
   )
 view(vcmax_25_tempresp_fits)
 
-#write vcmax25 and jmax25
-write_xlsx(jmax_tempresp_fits1, "jmax25_tempresp_fits.xlsx")
+#write vcmax25
 write_xlsx(vcmax25_tempresp_fits, "vcmax25_tempresp_fits.xlsx")
 
-hist(jmax_tempresp_fits1$ a, main = "Distribution of a") 
-hist(jmax_tempresp_fits1$ b, main = "Distribution of b") 
-hist(jmax_tempresp_fits1$ c, main = "Distribution of c")
 
 #jmax-------------------------------
-#load jmax raw data
+##fiting model for jmax
+quad_exp_jfit_lm <- tresp_data %>%
+  group_by(plant_id_new) %>% #group by plant id
+  filter(!is.na(obs_jmax)) %>%  # remove NA rows
+  filter(n() >= 3) %>%                               # require at least 3 points
+  group_modify(~{
+    model <- lm(log(obs_jmax) ~ Tleaf_mean + Tleaf_mean2, data = .x)
+    data.frame(
+      n_points = nrow(.x),
+      intercept = coef(model)[1],# Points at Tleaf = Ta
+      
+      b1 = coef(model)[2],
+      b2 = coef(model)[3],
+      Topt = -coef(model)[2] / (2 * coef(model)[3])
+    )
+  })
+
+head(quad_exp_jfit_lm)
+summary(quad_exp_jfit_lm)
+
+
+#writing the model fit as excel sheet
+
+write_xlsx(quad_exp_jfit_lm, "jmax_tempresp_fits1.csv")
+
 #upload extracted a, b, and c values with treatment information for jmax 
+
 jmax_tempresp_fits1 <- read_csv("jmax_tempresp_fits1.csv")
 jmax_tempresp_fits1 <- jmax_tempresp_fits1 %>%
   mutate(airtemp_factor = factor(airtemp_factor,
@@ -199,7 +221,6 @@ head(jmax_tempresp_fits1)
 view(jmax_tempresp_fits1)
 
 
-#similar model as vcmax was use to extract the abc parameter for jmax
 #check distributions for a, b, and c
 hist(jmax_tempresp_fits1$ a, main = "Distribution of a")
 hist(jmax_tempresp_fits1$ b, main = "Distribution of b")
@@ -221,7 +242,7 @@ hist(jmax_tempresp_filter$ a, main = "Distribution of a")
 hist(jmax_tempresp_filter$ b, main = "Distribution of b")
 hist(jmax_tempresp_filter$ c, main = "Distribution of c")
 
-#fit lme for parameter a, b, c
+#fit lme for parameter a
 
 aj_lmer <- lmer(a ~ Nfert * airtemp_factor + 
                   (1|Rack:airtemp_factor), data = jmax_tempresp_filter)
@@ -231,6 +252,7 @@ Anova(aj_lmer)
 emmeans(aj_lmer, ~ Nfert * airtemp_factor)
 a_emm <- emmeans(aj_lmer, ~ airtemp_factor)
 
+#fit lme for parameter b
 bj_lmer <- lmer(b ~ Nfert * airtemp_factor + 
                   (1|Rack:airtemp_factor), data = jmax_tempresp_filter)
 plot(residuals(bj_lmer)~fitted(bj_lmer))
@@ -239,6 +261,7 @@ Anova(bj_lmer)
 emmeans(bj_lmer, ~ Nfert * airtemp_factor)
 b_emm <- emmeans(bj_lmer, ~ airtemp_factor)
 
+#fit lme for parameter b
 cj_lmer <- lmer(c ~ Nfert * airtemp_factor + 
                   (1|Rack:airtemp_factor), data = jmax_tempresp_filter)
 plot(residuals(cj_lmer)~fitted(cj_lmer))
@@ -247,10 +270,11 @@ Anova(cj_lmer)
 emmeans(cj_lmer, ~ Nfert * airtemp_factor)
 c_emm <- emmeans(cj_lmer, ~ airtemp_factor)
 
-#convert emeans to dataframe
+#convert emmeans to dataframe
 aj_emm_df <- as.data.frame(a_emm)
 bj_emm_df <- as.data.frame(b_emm)
 cj_emm_df <- as.data.frame(c_emm)
+
 #calculating the mean parameters per treatment for curves
 library(dplyr)
 mean_params <- data.frame( 
@@ -262,6 +286,7 @@ mean_params
 
 #creating temperature sequence
 temp_seq <- seq(15, 50, by = 0.5)
+
 #generaating smooth curves
 curve_data <- mean_params %>%
   rowwise() %>% mutate(
@@ -281,7 +306,7 @@ jmax_emmeans <- mean_params %>%
     Jmax_lower = exp((a - aj_emm_df$SE) + b * Ta + c * Ta^2)
   )
 
-#figure 
+#figure --------------------------------
 library(ggplot2) 
 Ta_colors <- c("Low" = "blue","Medium" = "orange", "High" = "red") 
 Ta_linetypes <- c("Low" = "solid", "Medium" = "solid", "High" = "solid")
@@ -321,14 +346,12 @@ plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 vj_combine
 vj_combine + plot_annotation(tag_levels = "A")
+
 ggsave("vj_combine.tiff",
        width = 8,
        height = 4,
        dpi = 600, compression = "lzw")
-ggsave("n_allocation.tiff",
-       width = 6.7,
-       height = 5.9,
-       dpi = 600, compression = "lzw")
+
 
 #estimate jmax25-----------------------
 jmax_25_tempresp_fits <- jmax_tempresp_fits1%>%
@@ -336,6 +359,7 @@ jmax_25_tempresp_fits <- jmax_tempresp_fits1%>%
     Jmax25 = exp(a + b*25 + c*25^2)
   )
 view(jmax_25_tempresp_fits)
+
 #merge vcmax25 and jmax25-------------------
 merged25_data <- vcmax_25_tempresp_fits%>%
   left_join(
@@ -394,14 +418,12 @@ jv_data <- jv_data %>%
 head(jv_data)
 view(jv_data)
 
-##fit lme model for Vcmax
+##fit lme model for Jmax/Vcmax
 jv_lmer <- lmer(JV_ratio ~ Nfert * airtemp_factor + 
                   (1|airtemp_factor), data = jv_data)
 plot(residuals(jv_lmer)~fitted(jv_lmer))
 summary(jv_lmer)
 Anova(jv_lmer)
-
-
 
 ##test trends
 test(emtrends(jv_lmer, ~1, var = 'Nfert', at = list(airtemp_factor = 'High')))
@@ -430,13 +452,14 @@ jv_emtrend_all <- summary(
 jv_intercept_all <- summary(
   emmeans(jv_lmer, ~1, at = list(Nfert = 0))
 )
+
 ##single pooled function
 jv_func_all <- function(x)
 {jv_emtrend_all[1,2] * x + jv_intercept_all[1,2]}
-##plot
+
+##plot-----------------------------------------------
 jv_plot_new <- ggplot(aes(y = JV_ratio, x = Nfert,
-           color = airtemp_factor,
-           shape = airtemp_factor),   # 👈 ADD THIS
+           color = airtemp_factor),  
        data = jv_data)+
   geom_point(alpha = 0.6, size = 3) +
   scale_color_manual(values = c('High' = 'red', 'Medium' = 'orange', 'Low' =  'blue'))+
@@ -489,6 +512,7 @@ pl_intercept_all <- summary(
 ##single pooled function
 pl_func_all <- function(x)
 {pl_emtrend_all[1,2] * x + pl_intercept_all[1,2]}
+
 ##plot-------------------------------------------
 height_plot <- ggplot(biomass, aes(x = Nfert, y = `Plant height (cm)`,
                     color = airtemp_factor)) +
@@ -517,7 +541,7 @@ height_plot <- ggplot(biomass, aes(x = Nfert, y = `Plant height (cm)`,
 
 height_plot
 
-#explore aboveground
+#explore aboveground-----------------------------------
 hist(biomass$`Above ground biomass (g)`) #better avoveground
 ####fit lme for aboveground biomass
 aboveground_lmer <- lmer(`Above ground biomass (g)`~ Nfert * airtemp_factor + (1| Rack:airtemp_factor), 
@@ -565,7 +589,7 @@ aboveground_plot <- ggplot(biomass, aes(x = Nfert, y = `Above ground biomass (g)
 
 aboveground_plot
 
-#explore belowground
+#explore belowground-----------------------------------------------
 hist(biomass$Belowground_biomass) # better belowground
 biomass <- biomass %>%
   mutate(belowground_g = Belowground_biomass/1000)
@@ -588,7 +612,7 @@ bl_intercept_all <- summary(
 bl_func_all <- function(x)
 {bl_emtrend_all[1,2] * x + bl_intercept_all[1,2]}
 
-#plot
+#plot----------------------------------------------------------------
 belowground_plot <- ggplot(biomass, aes(x = Nfert, y = belowground_g,
                                         color = airtemp_factor)) +
   geom_point(alpha = 0.6, size = 3) +
@@ -616,7 +640,7 @@ belowground_plot <- ggplot(biomass, aes(x = Nfert, y = belowground_g,
 
 belowground_plot
 
-#root:shoot ratio
+#root:shoot ratio -----------------------------------------------------------
 biomass <- biomass %>%
   mutate(
     root_shoot_ratio = belowground_g/`Above ground biomass (g)`
@@ -641,7 +665,8 @@ rs_intercept_all <- summary(
 ##single pooled function
 rs_func_all <- function(x)
 {rs_emtrend_all[1,2] * x + rs_intercept_all[1,2]} 
-#plot
+
+#plot----------------------------------------------
 root_shoot_plot <- ggplot(biomass, aes(x = Nfert, y = root_shoot_ratio,
                                         color = airtemp_factor)) +
   geom_point(alpha = 0.6, size = 3) +
@@ -668,6 +693,7 @@ root_shoot_plot <- ggplot(biomass, aes(x = Nfert, y = root_shoot_ratio,
   theme.custom
 
 root_shoot_plot  
+
 ##merge plot for journal------------------
 library(patchwork)
 biomass_figure <- 
@@ -677,25 +703,14 @@ biomass_figure <-
 
 biomass_figure+
   plot_annotation(tag_levels = "A")
+
 ##export 
 ggsave("biomass_figure.tiff",
        width = 6.7,
        height = 5.9,
        dpi = 600, compression = "lzw")
-#merge plots-----------------
-biomass_figure <-
-  height_plot +
-  theme(legend.position = "none") +
-  
-  (aboveground_plot + theme(legend.position = "none")) +
-  (belowground_plot + theme(legend.position = "bottom")) +
-  (root_shoot_plot + theme(legend.position = "none")) +
-  
-  plot_layout(ncol = 2)
 
-biomass_figure +
-  plot_annotation(tag_levels = "A")
-#chlorophyll calculations
+#chlorophyll calculations-------------------------------
 library(readxl)
 data <- read_excel("chlorophyll extraction.xlsx")
 head(data)
@@ -723,10 +738,14 @@ data$chl_mmol.m2 <- data$chla_mmol.m2 + data$chlb_mmol.m2 #Chlarea #light captur
 hist(data$chl_mmol.m2)
 data$chl_mmol.m2_narea <- data$chl_mmol.m2 / data$narea
 hist(data$chl_mmol.m2_narea)
-#upload data vcmax25 and jmax25 for re-analysis
+
+#upload data vcmax25 and jmax25 for re-analysis (NB: Vcmax25 and Jmax25 data was extracted using 
+#the same quadratic model) 
 library(readr)
+
 vcmax25_jmax25_only <- read_csv("vcmax25_jmax25_only.csv")
-View(vcmax25_jmax25_only)
+View(vcmax25_jmax25_only) #nmass, leaf biomass and leaf area is attached
+
 #clean chlorophyll ids to make sure they have the same ids
 library(stringr)
 
@@ -748,7 +767,7 @@ final_data <- final_data %>%
                                  levels = c("High", "Medium", "Low")))
 view(final_data)
 
-#estimate actual Narea
+#estimate actual area for leaves used for chlorophyl extraction
 final_data$area_m2 <- final_data$`leaf area (cm2)`/10000 #change cm2 to m2
 final_data$Marea <- final_data$`Leaf biomass (g)`/final_data$area_m2
 final_data$N_leaf <- final_data$nmass * final_data$`Leaf biomass (g)` #compute total N per leaf
@@ -826,8 +845,9 @@ clean_final_data$propN_photosynthesis = clean_final_data$propN_rubisco + clean_f
 hist(clean_final_data$propN_photosynthesis)
 
 view(clean_final_data)
+
 ###write out data for publication
- write.csv(clean_final_data, "temp_nitrogen_2025_data.csv")
+ write.csv(clean_final_data, "temp_nitrogen_2026.csv")
 
 
 ##figures for vcmax25, jmax25, Chlarea, Chlmass, Narea, Marea,

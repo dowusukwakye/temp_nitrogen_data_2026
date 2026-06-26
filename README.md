@@ -6,19 +6,27 @@ This repository contains files for the air temperature and soil nitrogen supply 
 
 ## **Summary of files**
 
-### **scripts**
-- Inside the scripts data, the file [Analysis_temp_nit_2026.r](scripts/Analysis_temp_nit_2026.r) contains the code for the data analysis and data visualization. It also contains codes for the exponential quadratic equation used for the temperature response curves. 
+### **scripts folder**
+- Inside the scripts folder, the file [Analysis_temp_nit_2026.r](scripts/Analysis_temp_nit_2026.r) contains the code for the data analysis and data visualization. It also contains codes for the exponential quadratic equation used for the temperature response curves. 
 
-### **data**
-The data folder contains the following files:
+### **output data folder**
+The output data folder contains the following files:
 
-- [temp_nitrogen_2026.csv](data/temp_nitrogen_2026.csv) contains chlorophyll and nitrogen allocation-related files.
+- [temp_nitrogen_2026.csv](output data/temp_nitrogen_2026.csv) contains output of chlorophyll, Vcmax, Jmax, and nitrogen allocation-related files.
 
-- [vcmax_tempresp_fits.csv](data/vcmax_tempresp_fits.csv) contains parameter values for vcmax, estimated from the quadratic model
+- [vcmax_tempresp_fits.csv](output data/vcmax_tempresp_fits.csv) contains parameter values for vcmax, estimated from the quadratic model (Vcmax = exp(a + b * T + c * T^2)
 
-- [jmax_tempresp_fits1.csv](data/jmax_tempresp_fits1.csv) contains parameter values for jmax, estimated from the quadratic model
+- [jmax_tempresp_fits1.csv](output data/jmax_tempresp_fits1.csv) contains parameter values for jmax, estimated from the quadratic model (Jmax= exp(a + b * T + c * T^2)
 
-- [biomass_data](data/biomass_data.csv) contains morphology and biomass data
+### **data folder**
+
+- [biomass_2025_data](data/biomass_data.csv) contains morphology and biomass data
+
+- [curve_level data.csv](data/curve_level data.csv) contains the curve level data
+
+- [chlorophyll extraction.csv](data/chlorophyll extraction.csv) contains chrlorophyll extraction raw data
+
+- [vcmax25_jmax25_only.xlsx](data/vcmax25_jmax25_only.xlsx) contains related files of vcmax25 and jmax25 extracted, but file was merged with the leaf n content file manually.
 
 
 ## **important names to take note:**
@@ -34,5 +42,5 @@ The data folder contains the following files:
 - Nfert: soil nitrogen supply treatment (ppm).
 
 
-_ for inquiries contact me on (dowusukw@ttu.edu).
+- For inquiries, contact me at (dowusukw@ttu.edu).
 
