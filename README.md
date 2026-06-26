@@ -35,7 +35,7 @@ The output data folder contains the following files:
 
 - Rack: the position of the pot in the light bank (top/down).
 
-- Aitemp: the air temperature treatment (37°C/30°C/23°C).
+- Airtemp: the air temperature treatment (37°C/30°C/23°C).
 
 - airtemp_factor: the air temperature treatment as a factor (High/Medium/Low).
 
