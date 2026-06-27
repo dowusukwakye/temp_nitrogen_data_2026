@@ -1,5 +1,5 @@
 ﻿biomass_2025_data,,,,,,,,
-,plant_id,Rack,Airtemp,airtemp_factor,Nfert,Plant height (cm),Belowground_biomass,Above ground biomass (g)
+,plant_id,Rack,Airtemp,airtemp_factor,Nfert,Plant height (cm),Belowground_biomass_mg,Above ground biomass (g)
 1,1D,top,37,High,0,13,79,0.18
 2,2D,top,37,High,35,17,158.1,0.33
 3,3D,top,37,High,70,18,195,0.65

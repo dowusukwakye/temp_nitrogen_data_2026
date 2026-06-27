@@ -8,7 +8,7 @@
 Inside the scripts folder includes:
 - The file [Analysis_temp_nit_2026.r](scripts/Analysis_temp_nit_2026.r) contains the code for the data analysis and data visualization. It also contains codes for the exponential quadratic equation used for the temperature response curves. 
 
-- The file [climate.r](scripts/climate.r) contains the scripts for data visualization of the diurnal temperature and relative humidity for the growth temperatures (37°C, 30°C, and 23°). Data was recorded with the HOBO sensors.
+- The file [climate.R](scripts/climate.R) contains the scripts for data visualization of the diurnal temperature and relative humidity for the growth temperatures (37°C, 30°C, and 23°). Data was recorded with the HOBO sensors.
 
 ### **output folder**
 The output data folder contains the following files:
