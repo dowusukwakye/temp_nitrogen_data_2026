@@ -1,8 +1,6 @@
 # Temp_nitrogen_data_2026
 
-**Repository Description**
-
-This repository contains files for the air-temperature and soil-nitrogen supply experiment.
+**This repository contains files for the air-temperature and soil-nitrogen supply experiment.**
 
 ## **Summary of files**
 
@@ -10,7 +8,7 @@ This repository contains files for the air-temperature and soil-nitrogen supply 
 Inside the scripts folder includes:
 - The file [Analysis_temp_nit_2026.r](scripts/Analysis_temp_nit_2026.r) contains the code for the data analysis and data visualization. It also contains codes for the exponential quadratic equation used for the temperature response curves. 
 
-- The file [climate_script](scripts/climate_script.r) contains the climate script.
+- The file [climate_script](scripts/climate_script.r) contains the scripts for data visualization of the diurnal temperature and relative humidity for the growth temperatures (37°C, 30°C, and 23°). Data was recorded with the HOBO sensors.
 
 ### **output folder**
 The output data folder contains the following files:
@@ -23,7 +21,7 @@ The output data folder contains the following files:
 
 ### **data folder**
 
-- Here [biomass_2025_data](data/biomass_data.csv) contains morphology and biomass data.
+- Here [biomass_2025_data](data/biomass_2025_data.csv) contains morphology and biomass data.
 
 - Here [curve_level_data.csv](data/curve_level_data.csv) contains the curve level data.
 
